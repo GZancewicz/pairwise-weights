@@ -23,19 +23,54 @@ Only these three answers exist. Never offer other magnitudes.
   say once that consistency usually suffers and offer to cluster instead.
 - Define every cluster in plain language **before** the first pair. Name, what it covers,
   what high and low look like. One short block each.
-- Ask **one pair per question**. The scale needs 5 answers but the question UI caps at 4
-  options, so use exactly this layout for every pair:
-  - `About the same` (1)
-  - `<A> more` (5)
-  - `<A> much more` (10)
-  - `<B> more` (5)
-  - `<B> much more` (10) — user selects Other and types it; state this once at the start,
-    not on every question.
+### Do not use the interactive picker
 
-  Never vary this layout mid-run: option order is itself a bias, and changing it makes
-  early and late pairs non-comparable.
-- Batch 2-4 pairs per call. Track and show progress: `pair 3/10`.
-- Do not re-explain the scale on every question.
+`AskUserQuestion` caps options at 4. The scale needs 5. Routing the fifth through "Other"
+makes four answers one click and the fifth free-text typing — and people pick what's
+visible, which tilts every pair toward whichever criterion is listed first. Over ten pairs
+that bias is larger than the signal being measured.
+
+Ask in **plain text** instead, with a symmetric 1-5 spectrum the user answers by number.
+
+### The prompt format
+
+Use exactly this, every pair, no variation:
+
+```
+Pair 3/10 — Photography vs. Newcomer clarity
+
+  1  Photography MUCH more important
+  2  Photography more important
+  3  About the same
+  4  Newcomer clarity more important
+  5  Newcomer clarity MUCH more important
+```
+
+Values: `1`→10, `2`→5, `3`→1, `4`→0.2, `5`→0.1 (from the row criterion's perspective).
+
+Rules:
+
+- The left-hand criterion is always options 1-2, the right-hand always 4-5. Never reorder
+  mid-run — position is itself a bias, and reordering makes early and late pairs
+  non-comparable.
+- Accept a bare number, or plain language ("same", "photography a lot more"). Echo back
+  what you recorded so a mistyped digit is caught immediately.
+- Show progress on every pair: `Pair 3/10`.
+- Do not re-explain the scale between pairs. State it once, up front.
+
+### Fast mode
+
+If the user would rather not go one at a time, offer to list all pairs at once and take
+the answers in a single reply:
+
+```
+1. Mobile vs. Hierarchy
+2. Mobile vs. Photography
+...
+Reply with 10 numbers, e.g. 2 4 3 1 5 3 2 4 1 3
+```
+
+Slightly worse for deliberation, much faster. Offer it once; don't push it.
 
 ## Computing
 

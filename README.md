@@ -68,15 +68,17 @@ pocket-handbook form: you can do it without a computer.
 
 Criteria are grouped into clusters — around five works best. Claude asks you about each pair:
 
-> Which matters more: **Photography & visual identity** or **Mobile & performance**?
+> **Pair 3/10 — Photography vs. Mobile & performance**
 >
-> - About the same
-> - Photography more
-> - Photography much more
-> - Mobile more
-> - Mobile much more
+> ```
+>   1  Photography MUCH more important
+>   2  Photography more important
+>   3  About the same
+>   4  Mobile MORE important
+>   5  Mobile MUCH more important
+> ```
 
-Answers map to a 1/5/10 scale. The reciprocal is filled in automatically, so you're never
+You answer with a number. Answers map to a 1/5/10 scale. The reciprocal is filled in automatically, so you're never
 asked the same pair twice. Row sums are normalized to 100%.
 
 Intransitive answers (A > B > C > A) are named rather than quietly averaged away.
@@ -139,42 +141,53 @@ inconsistent answers is your understanding of a criterion drifting mid-run.
 
 ### 3. Comparisons
 
-One pair per question, the same five options every time, with a running count. Every
-answer becomes one raw value, and its reciprocal is filled in for free.
+One pair at a time, the same symmetric 1-5 spectrum every time, with a running count.
+Every answer becomes one raw value, and its reciprocal is filled in for free.
 
-> **Pair 1/6 — Which matters more: Price or Commute?**
-> - About the same
-> - Price more
-> - Price much more
-> - Commute more
-> - *(Other → "Commute much more")*
+> **Pair 1/6 — Price vs. Commute**
+>
+> ```
+>   1  Price MUCH more important
+>   2  Price more important
+>   3  About the same
+>   4  Commute more important
+>   5  Commute MUCH more important
+> ```
 
-**You answer: `Price more`** → records `Price:Commute = 5`, and `Commute:Price = 0.2`
+**You answer `2`** → records `Price:Commute = 5`, and `Commute:Price = 0.2`
 
-> **Pair 2/6 — Which matters more: Price or Space?**
-> - About the same · Price more · Price much more · Space more · *(Other → "Space much more")*
+> **Pair 2/6 — Price vs. Space**
 
-**You answer: `Price much more`** → records `Price:Space = 10`, and `Space:Price = 0.1`
+**You answer `1`** → records `Price:Space = 10`, and `Space:Price = 0.1`
 
-> **Pair 3/6 — Which matters more: Price or Natural light?**
+> **Pair 3/6 — Price vs. Natural light**
 
-**You answer: `Price much more`** → records `Price:Light = 10`, and `Light:Price = 0.1`
+**You answer `1`** → records `Price:Light = 10`, and `Light:Price = 0.1`
 
-> **Pair 4/6 — Which matters more: Commute or Space?**
+> **Pair 4/6 — Commute vs. Space**
 
-**You answer: `Commute more`** → records `Commute:Space = 5`, and `Space:Commute = 0.2`
+**You answer `2`** → records `Commute:Space = 5`, and `Space:Commute = 0.2`
 
-> **Pair 5/6 — Which matters more: Commute or Natural light?**
+> **Pair 5/6 — Commute vs. Natural light**
 
-**You answer: `Commute much more`** → records `Commute:Light = 10`, and `Light:Commute = 0.1`
+**You answer `1`** → records `Commute:Light = 10`, and `Light:Commute = 0.1`
 
-> **Pair 6/6 — Which matters more: Space or Natural light?**
+> **Pair 6/6 — Space vs. Natural light**
 
-**You answer: `About the same`** → records `Space:Light = 1`, and `Light:Space = 1`
+**You answer `3`** → records `Space:Light = 1`, and `Light:Space = 1`
 
 Six questions, twelve values. Claude never asks Commute-vs-Price after asking
 Price-vs-Commute — that cell is already known. No re-explaining the scale between
 questions, no commentary.
+
+Positions never move: the left-hand criterion is always 1-2, the right-hand always 4-5.
+That symmetry is the point. An interface where one direction is easier to pick than the
+other quietly biases every answer, which is why this uses a plain numbered list rather
+than Claude Code's built-in option picker — that picker caps at four choices, and a
+five-point scale doesn't fit without making the fifth option harder to reach than the
+other four.
+
+In a hurry? Ask for all pairs at once and answer with a single line: `2 1 1 2 1 3`.
 
 ### 4. Consistency
 

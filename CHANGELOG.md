@@ -3,6 +3,16 @@
 Versions follow [semver](https://semver.org/): breaking changes to the method or output
 shape bump major, new capability bumps minor, corrections bump patch.
 
+## 1.3.0
+
+- Replaced the interactive option picker with a plain numbered 1-5 prompt. Claude Code's
+  `AskUserQuestion` caps options at 4; a five-point scale only fit by pushing the fifth
+  answer into free-text "Other", which made four answers one click and the fifth typing —
+  biasing every pair toward the criterion listed first
+- Options are now symmetric and positionally fixed: left criterion is always 1-2, right is
+  always 4-5
+- Added fast mode: list all pairs, answer with one line of numbers
+
 ## 1.2.0
 
 - Renamed from `pairwise-weights` to `ahp-comparison-matrix`
