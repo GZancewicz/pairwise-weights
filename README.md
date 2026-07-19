@@ -7,6 +7,33 @@ websites — the hard part isn't the scoring, it's deciding how much each criter
 Guessing at percentages produces weights nobody trusts. This skill derives them from a
 series of simple two-way comparisons instead.
 
+**Reach for it when you need to:**
+
+- Weight scoring criteria for a rubric, evaluation, or decision matrix
+- Prioritize requirements, features, or a backlog by relative importance
+- Rank vendors, candidates, tools, or designs against multiple criteria
+- Turn a stakeholder argument about priorities into numbers people will accept
+- Build a Six Sigma / TQM prioritization matrix
+
+Claude asks you one two-way question at a time, fills in the reciprocals automatically,
+and returns weights summing to 100%. It can then score options against those weights for a
+final ranking.
+
+## Install
+
+```
+/plugin marketplace add GZancewicz/ahp-comparison-matrix
+/plugin install ahp-comparison-matrix@GZancewicz
+```
+
+## Use
+
+Just describe the problem:
+
+> Help me weight these criteria for evaluating job candidates.
+
+Or invoke it directly with `/ahp-comparison-matrix`.
+
 ## History
 
 The method is the **Analytic Hierarchy Process**, developed by Thomas Saaty at the
@@ -19,10 +46,12 @@ AHP spread well beyond decision theory. It entered quality practice as the
 **prioritization matrix**, one of the Seven Management and Planning Tools, where the
 rigorous variant is still called the "full analytical criteria method." That is the route
 by which most people meet it: not in a textbook, but in a Six Sigma or TQM course,
-condensed to a few pages in a pocket handbook. The GOAL/QPC *Memory Jogger* series is the
-most likely such book, though several publishers produced near-identical versions.
+condensed to a few pages in GOAL/QPC's *Memory Jogger* — the pocket handbook that put
+these tools in the hands of people who had never read Saaty and never needed to.
 
-This skill is that handbook version, not the textbook one. Two deliberate simplifications:
+This skill is that handbook version, not the textbook one — it exists because the book is
+easy to lose and the method is hard to reconstruct from memory. Two deliberate
+simplifications:
 
 | | Textbook AHP | This skill |
 |---|---|---|
@@ -167,21 +196,6 @@ Divide each row sum by the total:
 | Space | 2.3 / 46.7 | **4.9%** |
 | Natural light | 2.2 / 46.7 | **4.7%** |
 | | | 100.0% |
-
-## Install
-
-```
-/plugin marketplace add GZancewicz/ahp-comparison-matrix
-/plugin install ahp-comparison-matrix@GZancewicz
-```
-
-## Use
-
-Just describe the problem:
-
-> Help me weight these criteria for evaluating job candidates.
-
-Or invoke it directly with `/ahp-comparison-matrix`.
 
 ## Letting Claude do the comparisons
 
