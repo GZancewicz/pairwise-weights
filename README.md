@@ -70,13 +70,11 @@ Criteria are grouped into clusters — around five works best. Claude asks you a
 
 > **Pair 3/10 — Photography vs. Mobile & performance**
 >
-> ```
->   1  Photography MUCH more important
->   2  Photography more important
->   3  About the same
->   4  Mobile MORE important
->   5  Mobile MUCH more important
-> ```
+> 1. Photography **much** more important
+> 2. Photography more important
+> 3. About the same
+> 4. Mobile more important
+> 5. Mobile **much** more important
 
 You answer with a number. Answers map to a 1/5/10 scale. The reciprocal is filled in automatically, so you're never
 asked the same pair twice. Row sums are normalized to 100%.
@@ -146,13 +144,11 @@ Every answer becomes one raw value, and its reciprocal is filled in for free.
 
 > **Pair 1/6 — Price vs. Commute**
 >
-> ```
->   1  Price MUCH more important
->   2  Price more important
->   3  About the same
->   4  Commute more important
->   5  Commute MUCH more important
-> ```
+> 1. Price **much** more important
+> 2. Price more important
+> 3. About the same
+> 4. Commute more important
+> 5. Commute **much** more important
 
 **You answer `2`** → records `Price:Commute = 5`, and `Commute:Price = 0.2`
 

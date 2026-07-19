@@ -34,19 +34,21 @@ Ask in **plain text** instead, with a symmetric 1-5 spectrum the user answers by
 
 ### The prompt format
 
-Use exactly this, every pair, no variation:
+Every pair, no variation. **Write it as ordinary prose and a normal markdown list — never
+inside a code block.** These are questions for a person to read, not code; monospace makes
+them look like output to skim past rather than a question to answer.
 
-```
-Pair 3/10 — Photography vs. Newcomer clarity
+The rendered result should look like this:
 
-  1  Photography MUCH more important
-  2  Photography more important
-  3  About the same
-  4  Newcomer clarity more important
-  5  Newcomer clarity MUCH more important
-```
+> **Pair 3/10 — Photography vs. Newcomer clarity**
+>
+> 1. Photography **much** more important
+> 2. Photography more important
+> 3. About the same
+> 4. Newcomer clarity more important
+> 5. Newcomer clarity **much** more important
 
-Values: `1`→10, `2`→5, `3`→1, `4`→0.2, `5`→0.1 (from the row criterion's perspective).
+Values: 1→10, 2→5, 3→1, 4→0.2, 5→0.1 (from the row criterion's perspective).
 
 Rules:
 
@@ -63,12 +65,8 @@ Rules:
 If the user would rather not go one at a time, offer to list all pairs at once and take
 the answers in a single reply:
 
-```
-1. Mobile vs. Hierarchy
-2. Mobile vs. Photography
-...
-Reply with 10 numbers, e.g. 2 4 3 1 5 3 2 4 1 3
-```
+list them as a normal numbered list (again, not in a code block) and ask for one line of
+answers, e.g. `2 4 3 1 5 3 2 4 1 3`.
 
 Slightly worse for deliberation, much faster. Offer it once; don't push it.
 
