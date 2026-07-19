@@ -3,6 +3,24 @@
 Versions follow [semver](https://semver.org/): breaking changes to the method or output
 shape bump major, new capability bumps minor, corrections bump patch.
 
+## 2.0.0
+
+**Breaking:** weights are now derived from the principal eigenvector rather than
+normalized row sums. Existing matrices produce different (better) weights — regenerate any
+saved weights files.
+
+- Weights come from the principal eigenvector, computed by power iteration. Row sums are
+  the hand-calculation shortcut and let a single odd answer move a weight by several
+  points; the eigenvector is dominated by the strongest coherent signal, which is why
+  Saaty specified it
+- Added Saaty's Consistency Ratio, reported with every result. It falls out of the
+  eigenvector calculation for free
+- Added residual analysis to locate *which* pair is inconsistent — CR only says how much.
+  The prior version could only detect strict rank cycles, so a matrix could contain a 25x
+  self-contradiction and pass silently
+- Consistency is now checked before weights are reported, not after
+- Output files include a `consistency` block
+
 ## 1.3.2
 
 - Every option now names both criteria and reads as a complete sentence ("Photography more

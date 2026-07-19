@@ -1,9 +1,9 @@
 ---
 name: ahp-comparison-matrix
-description: Build an AHP comparison matrix — derive criterion weights from pairwise comparisons on a 1/5/10 scale with reciprocal fill, row sums, and normalization to 100%, then optionally score options against those weights. Use when weighting scoring criteria, building a rubric or decision matrix, prioritizing requirements, or the user asks for AHP / pairwise comparison / a prioritization matrix.
+description: Build an AHP comparison matrix — derive criterion weights from pairwise comparisons on a 1/5/10 scale with reciprocal fill, principal-eigenvector weights, and a Saaty consistency check, then optionally score options against those weights. Use when weighting scoring criteria, building a rubric or decision matrix, prioritizing requirements, or the user asks for AHP / pairwise comparison / a prioritization matrix.
 ---
 
-# Pairwise comparison weights
+# AHP comparison matrix
 
 ## Scale
 
@@ -78,22 +78,74 @@ Slightly worse for deliberation, much faster. Offer it once; don't push it.
 
 1. Build the n×n matrix. Diagonal = 1. Fill the reciprocal automatically — never ask the
    same pair twice.
-2. Sum each row, including the diagonal.
-3. Normalize the row sums to 100%. These are the weights.
+2. **Weights are the principal eigenvector**, normalized to 100%. Compute it by power
+   iteration: start with a uniform vector, repeatedly multiply by the matrix and
+   renormalize, ~500 iterations. Always compute this in code, never by hand or by
+   estimation — a hand-approximated eigenvector is just a row sum with extra steps.
+3. Report the Consistency Ratio alongside the weights (below).
 
-Do not offer alternative aggregation methods unless asked. Textbook AHP uses the principal
-eigenvector and will give somewhat different numbers; that is a known, accepted difference,
-not a defect to correct mid-run.
+Use the eigenvector, not row sums. Row sums are the hand-calculation shortcut taught in
+pocket handbooks, and they let one odd answer drag a weight by several points. The
+eigenvector is dominated by the strongest coherent signal across all answers, which is
+the entire reason Saaty specified it — inconsistency is the normal case.
+
+Reference implementation:
+
+    def weights(M):
+        n = len(M); v = [1/n]*n
+        for _ in range(500):
+            v = [sum(M[i][j]*v[j] for j in range(n)) for i in range(n)]
+            s = sum(v); v = [x/s for x in v]
+        return v
 
 ## Consistency
 
-Report intransitive judgments explicitly. If A > B and B > C but C > A, name the cycle and
-ask which of the three to revisit. Do not silently average it away.
+**Always run this before reporting weights.** Inconsistency is expected — the job is to
+measure it, report it, and name the culprit, never to hide it or silently average it away.
+
+### Consistency Ratio
+
+    lambda_max = mean over i of ( (M·v)[i] / v[i] )
+    CI  = (lambda_max - n) / (n - 1)
+    CR  = CI / RI        RI = {3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32}
+
+Report CR with the weights, always, in one line. Saaty's threshold is **CR ≤ 0.10**.
+
+**Interpret it honestly.** The 1/5/10 scale inflates CR: if A > B (5) and B > C (5), the
+implied A:C is 25, which the scale cannot express — so structurally consistent answers can
+still score badly. Do not tell the user their judgment is poor because CR > 0.10 on a
+5-criterion matrix. Report the number, note when the coarse scale is the likely cause, and
+move on unless a specific pair stands out.
+
+### Finding the culprit
+
+CR says *how much* inconsistency exists, not *where*. For that, compute the residual of
+each pair against the finished weights:
+
+    residual(i,j) = abs( ln( M[i][j] / (v[i]/v[j]) ) )
+
+Rank pairs by residual. Anything above ~1.0 (roughly a 3× disagreement) is worth naming:
+
+> Your answers imply Mobile ≈ 6.5× Content depth, but you answered "about the same."
+> That comes from rating Mobile > Hierarchy > Content depth.
+
+Name at most the top two. Offer to re-ask; do not force it. If the user keeps their
+answer, accept it — their judgment outranks the arithmetic — and record the residual in
+the output so the tension is visible rather than buried.
+
+### Strict cycles
+
+A true rank cycle (A > B, B > C, C > A) is a different failure and always worth naming
+explicitly, regardless of CR.
 
 ## Output
 
-A table of criterion and weight, sorted descending. Then the matrix itself, so the user
-can audit it.
+A table of criterion and weight, sorted descending. Then the Consistency Ratio in one
+line, then the matrix itself so the user can audit it.
+
+When writing results to a file, include a `consistency` block: `lambda_max`, `ci`, `cr`,
+and the ranked residuals. A weights file that records only the weights hides the thing a
+future reader most needs to judge them by.
 
 Then one short diagnostic line: if two criteria carry most of the weight, or one is near
 zero, say so and **name the specific pairs that caused it**. Users who find a weight

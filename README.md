@@ -56,13 +56,20 @@ simplifications:
 | | Textbook AHP | This skill |
 |---|---|---|
 | Scale | 1–9 (nine gradations) | 1 / 5 / 10 (three) |
-| Weights from | Principal eigenvector | Row sums, normalized |
+| Weights from | Principal eigenvector | Principal eigenvector |
+| Consistency | Consistency Ratio | Consistency Ratio |
 
-Saaty's nine-point scale asks people to distinguish "moderately more important" from
-"moderately-to-strongly more important." In practice that precision is illusory — the
-three-point version loses very little and finishes in a third of the time. The row-sum
-normalization is the classic hand-calculation shortcut, which is why it survived into
-pocket-handbook form: you can do it without a computer.
+Only the scale is simplified. Saaty's nine-point version asks people to distinguish
+"moderately more important" from "moderately-to-strongly more important"; in practice that
+precision is illusory, and the three-point version loses little while finishing in a third
+of the time.
+
+The math is Saaty's, deliberately. Pocket handbooks usually teach row-sum normalization
+because it can be done by hand — but the eigenvector exists precisely to handle noisy
+judgments, and inconsistency is the normal case, not the exception. Row sums let a single
+odd answer drag a weight several points; the eigenvector is dominated by the strongest
+coherent signal across all your answers instead. The Consistency Ratio falls out of the
+same calculation for free.
 
 ## How it works
 
@@ -76,8 +83,9 @@ Criteria are grouped into clusters — around five works best. Claude asks you a
 > 4. Mobile & performance more important than photography
 > 5. Mobile & performance **much** more important than photography
 
-You answer with a number. Answers map to a 1/5/10 scale. The reciprocal is filled in automatically, so you're never
-asked the same pair twice. Row sums are normalized to 100%.
+You answer with a number. Answers map to a 1/5/10 scale. The reciprocal is filled in
+automatically, so you're never asked the same pair twice. Weights come from the matrix's
+principal eigenvector and sum to 100%.
 
 Intransitive answers (A > B > C > A) are named rather than quietly averaged away.
 
@@ -199,11 +207,12 @@ ask which of the three to revisit.
 
 The matrix, the weights, and a flag on anything worth a second look.
 
-> Price 55.7% · Commute 34.7% · Space 4.9% · Natural light 4.7%
+> Price 66.1% · Commute 24.7% · Space 4.9% · Natural light 4.3%
 >
-> Heads up: Price and Commute together carry 90%. Space and Natural light are doing almost
-> nothing — if that surprises you, the culprit is pair 2 and pair 3, where you said Price
-> mattered *much* more than both.
+> Consistency Ratio 0.09 — acceptable.
+>
+> Heads up: Price and Commute together carry 91%. If that surprises you, the culprit is
+> pairs 2 and 3, where you said Price mattered *much* more than both of the others.
 
 That last part matters. Weights that don't match your intuition usually mean one
 comparison was answered too strongly, and the skill points at which one instead of making
@@ -218,25 +227,43 @@ The six answers above, worked through to weights.
 Diagonal is 1. Everything below it is the reciprocal of its mirror above — filled in
 automatically, never asked.
 
-|  | Price | Commute | Space | Light | **Row sum** |
-|---|---|---|---|---|---|
-| **Price** | 1 | 5 | 10 | 10 | **26.0** |
-| **Commute** | 0.2 | 1 | 5 | 10 | **16.2** |
-| **Space** | 0.1 | 0.2 | 1 | 1 | **2.3** |
-| **Light** | 0.1 | 0.1 | 1 | 1 | **2.2** |
-| | | | | **Total** | **46.7** |
+|  | Price | Commute | Space | Light |
+|---|---|---|---|---|
+| **Price** | 1 | 5 | 10 | 10 |
+| **Commute** | 0.2 | 1 | 5 | 10 |
+| **Space** | 0.1 | 0.2 | 1 | 1 |
+| **Light** | 0.1 | 0.1 | 1 | 1 |
 
-### Normalizing to 100%
+### The weights
 
-Divide each row sum by the total:
+The weights are the matrix's principal eigenvector, normalized to 100%. In practice that
+means repeatedly multiplying the matrix by a running weight vector until it stops
+changing — a few dozen iterations, instantly.
 
-| Criterion | Row sum | Weight |
-|---|---|---|
-| Price | 26.0 / 46.7 | **55.7%** |
-| Commute | 16.2 / 46.7 | **34.7%** |
-| Space | 2.3 / 46.7 | **4.9%** |
-| Natural light | 2.2 / 46.7 | **4.7%** |
-| | | 100.0% |
+| Criterion | Weight |
+|---|---|
+| Price | **66.1%** |
+| Commute | **24.7%** |
+| Space | **4.9%** |
+| Natural light | **4.3%** |
+| | 100.0% |
+
+### The consistency check
+
+The same calculation reports how much your answers contradict each other. For a perfectly
+consistent matrix λmax equals n — here 4. It doesn't, and the gap is the measure:
+
+```
+λmax = 4.254    CI = 0.085    CR = 0.094
+```
+
+**CR below 0.10 is acceptable**, so these weights stand. Above it, at least one answer is
+fighting the others, and the skill names the specific pair before writing anything.
+
+Where would that come from? You said Price > Commute and Commute > Space, which implies
+Price ≫ Space — but the scale stops at 10, so you *couldn't* answer that pair consistently
+even if you wanted to. Some inconsistency is structural, not carelessness. That's exactly
+why Saaty measures it rather than forbidding it.
 
 ## Letting Claude do the comparisons
 
@@ -259,12 +286,14 @@ Three criteria for a parish website. Three pairs, three answers.
 > **Pair 2/3 — Newcomer clarity or Content depth?** → `Newcomer clarity much more` = 10
 > **Pair 3/3 — Mobile & performance or Content depth?** → `Mobile more` = 5
 
-|  | Clarity | Mobile | Depth | Row sum | **Weight** |
-|---|---|---|---|---|---|
-| **Newcomer clarity** | 1 | 5 | 10 | 16.0 | **68.1%** |
-| **Mobile & performance** | 0.2 | 1 | 5 | 6.2 | **26.4%** |
-| **Content depth** | 0.1 | 0.2 | 1 | 1.3 | **5.5%** |
-| | | | | 23.5 | 100.0% |
+|  | Clarity | Mobile | Depth | **Weight** |
+|---|---|---|---|---|
+| **Newcomer clarity** | 1 | 5 | 10 | **74.3%** |
+| **Mobile & performance** | 0.2 | 1 | 5 | **20.2%** |
+| **Content depth** | 0.1 | 0.2 | 1 | **5.5%** |
+| | | | | 100.0% |
+
+CR 0.08 — acceptable.
 
 ### Step 2 — Claude compares the options, one criterion at a time
 
@@ -274,24 +303,24 @@ total — and you never answer any of them.
 
 Here is the full matrix for the first criterion, **Newcomer clarity**:
 
-|  | Squarespace | WordPress | Astro | Wix | Custom | Row sum | **Local weight** |
-|---|---|---|---|---|---|---|---|
-| **Squarespace** | 1 | 5 | 1 | 5 | 0.2 | 12.2 | **20.2%** |
-| **WordPress** | 0.2 | 1 | 0.2 | 1 | 0.1 | 2.5 | **4.1%** |
-| **Astro** | 1 | 5 | 1 | 5 | 0.2 | 12.2 | **20.2%** |
-| **Wix** | 0.2 | 1 | 0.2 | 1 | 0.1 | 2.5 | **4.1%** |
-| **Custom build** | 5 | 10 | 5 | 10 | 1 | 31.0 | **51.3%** |
-| | | | | | | 60.4 | 100.0% |
+|  | Squarespace | WordPress | Astro | Wix | Custom | **Local weight** |
+|---|---|---|---|---|---|---|
+| **Squarespace** | 1 | 5 | 1 | 5 | 0.2 | **16.5%** |
+| **WordPress** | 0.2 | 1 | 0.2 | 1 | 0.1 | **4.0%** |
+| **Astro** | 1 | 5 | 1 | 5 | 0.2 | **16.5%** |
+| **Wix** | 0.2 | 1 | 0.2 | 1 | 0.1 | **4.0%** |
+| **Custom build** | 5 | 10 | 5 | 10 | 1 | **59.1%** |
+| | | | | | | 100.0% |
 
 Two more matrices, same shape, produce the other two columns:
 
 | Option | Clarity | Mobile | Depth |
 |---|---|---|---|
-| Squarespace | 20.2% | 17.9% | 8.9% |
-| WordPress | 4.1% | 3.9% | 42.2% |
-| Astro | 20.2% | 48.7% | 23.4% |
-| Wix | 4.1% | 3.9% | 2.0% |
-| Custom build | 51.3% | 25.5% | 23.4% |
+| Squarespace | 16.5% | 11.9% | 5.4% |
+| WordPress | 4.0% | 3.7% | 56.8% |
+| Astro | 16.5% | 56.7% | 17.7% |
+| Wix | 4.0% | 3.7% | 2.3% |
+| Custom build | 59.1% | 24.1% | 17.7% |
 
 Each column sums to 100% — it ranks the options *within* that one criterion.
 
@@ -300,19 +329,19 @@ Each column sums to 100% — it ranks the options *within* that one criterion.
 Multiply each option's local weight by its criterion weight and add:
 
 ```
-Custom build = (0.513 × 68.1%) + (0.255 × 26.4%) + (0.234 × 5.5%) = 43.0%
+Custom build = (0.591 × 74.3%) + (0.241 × 20.2%) + (0.177 × 5.5%) = 49.8%
 ```
 
 | Option | Weighted score |
 |---|---|
-| **Custom build** | **43.0%** |
-| Astro | 27.9% |
-| Squarespace | 19.0% |
-| WordPress | 6.2% |
-| Wix | 4.0% |
+| **Custom build** | **49.8%** |
+| Astro | 24.7% |
+| Squarespace | 14.9% |
+| WordPress | 6.8% |
+| Wix | 3.8% |
 | | 100.0% |
 
-Read the losers, not just the winner. **WordPress dominates content depth at 42.2% and
+Read the losers, not just the winner. **WordPress dominates content depth at 56.8% and
 still finishes fourth** — because you weighted depth at 5.5%. That isn't a flaw in the
 result; it's the result telling you what your own weights imply. If fourth place for
 WordPress feels wrong, the thing to revisit is pair 2, not the scoring.
