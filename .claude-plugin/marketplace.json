@@ -3,6 +3,9 @@
   "owner": {
     "name": "Greg Zancewicz"
   },
+  "metadata": {
+    "description": "Decision-analysis skills for Claude Code."
+  },
   "plugins": [
     {
       "name": "ahp-comparison-matrix",
