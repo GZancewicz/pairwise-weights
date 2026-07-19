@@ -61,6 +61,10 @@ ask which of the three to revisit. Do not silently average it away.
 A table of criterion, raw-sum weight, column-normalized weight — sorted descending. Then
 the matrix itself, so the user can audit it.
 
+Then one short diagnostic line: if two criteria carry most of the weight, or one is near
+zero, say so and **name the specific pairs that caused it**. Users who find a weight
+surprising need to know which comparison to revisit, not to redo the whole run.
+
 Weights apply only within their own matrix. Never merge two matrices or average across
 them without the user asking.
 

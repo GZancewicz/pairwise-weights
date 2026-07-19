@@ -29,6 +29,72 @@ Claude reports two sets of weights — raw-sum and column-normalized — because
 materially changes the answer, and you should see it rather than inherit it silently.
 Intransitive answers (A > B > C > A) are named rather than quietly averaged away.
 
+## What a session looks like
+
+The skill runs in five stages. You only ever answer one question at a time.
+
+### 1. Scoping
+
+Claude first cuts the criteria list down to something a human can actually judge. Pairs
+grow quadratically — 4 criteria is 6 questions, 8 is 28, 20 is 190 — so it clusters.
+
+> You've listed nine things you care about. That's 36 comparisons, and judgment gets
+> unreliable past about ten. Grouping into four clusters: **Price**, **Commute**,
+> **Space**, **Natural light** — with "rent", "utilities", and "deposit" folded into
+> Price. Six questions instead of thirty-six. Object to any of that grouping now.
+
+### 2. Definitions
+
+Every cluster is pinned down *before* the first pair, because the most common source of
+inconsistent answers is your understanding of a criterion drifting mid-run.
+
+> **Price** — total monthly outlay: rent, utilities, parking. Not the deposit.
+> **Commute** — door-to-desk time on a normal weekday morning.
+> **Space** — usable square footage and storage. Not layout quality.
+> **Natural light** — direct sun hours and window count.
+
+### 3. Comparisons
+
+One pair per question, same five options every time, with a running count.
+
+> **Pair 1/6 — Which matters more: Price or Commute?**
+> - About the same
+> - Price more
+> - Price much more
+> - Commute more
+> - *(Other → "Commute much more")*
+
+You answer `Price more`. Claude records 5, fills the reciprocal 0.2 automatically, and
+moves on. It never asks Commute-vs-Price — that answer already exists.
+
+> **Pair 2/6 — Which matters more: Price or Space?**
+
+...and so on through pair 6. No re-explaining the scale, no commentary between questions.
+
+### 4. Consistency
+
+Before computing, Claude checks whether your answers hang together, and names any cycle
+rather than silently averaging it away.
+
+> Your answers are transitive — Price > Commute > Space ≈ Light, no contradictions.
+
+Had you said Space > Price while also saying Price > Commute > Space, it would say so and
+ask which of the three to revisit.
+
+### 5. Weights
+
+The matrix, both calculations, and a flag on anything worth a second look.
+
+> Price 55.7% · Commute 34.7% · Space 4.9% · Natural light 4.7%
+>
+> Heads up: Price and Commute together carry 90%. Space and Natural light are doing almost
+> nothing — if that surprises you, the culprit is pair 2 and pair 3, where you said Price
+> mattered *much* more than both.
+
+That last part matters. Weights that don't match your intuition usually mean one
+comparison was answered too strongly, and the skill points at which one instead of making
+you re-derive it.
+
 ## Worked example
 
 Four criteria for choosing an apartment: **Price**, **Commute**, **Space**, **Natural light**.
