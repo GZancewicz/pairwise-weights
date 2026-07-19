@@ -1,6 +1,5 @@
 {
   "name": "ahp-comparison-matrix",
-  "displayName": "AHP Comparison Matrix",
   "description": "Derive criterion weights from pairwise comparisons (AHP-style) on a 1/5/10 scale, then score options against them for a weighted ranking.",
   "version": "1.1.0",
   "author": {
