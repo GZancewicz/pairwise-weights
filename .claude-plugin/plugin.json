@@ -1,0 +1,11 @@
+{
+  "name": "pairwise-weights",
+  "description": "Derive criterion weights from pairwise comparisons (AHP-style) using a 1/5/10 scale, reciprocal fill, and normalization to 100%.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Greg Zancewicz"
+  },
+  "homepage": "https://github.com/GZancewicz/pairwise-weights",
+  "repository": "https://github.com/GZancewicz/pairwise-weights",
+  "license": "MIT"
+}
